@@ -12,7 +12,7 @@ def main(page: ft.Page):
         senha = campo_senha.value
 
         if usuario and senha:
-            if usuario == "admin" and senha == "1234":  # Validação simples
+            if usuario == "admin" and senha == "1234":  
                 snack_bar = ft.SnackBar(
                     content=ft.Text("Login realizado com sucesso!"),
                     bgcolor="green",
