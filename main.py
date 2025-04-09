@@ -65,7 +65,6 @@ def main(page: ft.Page):
 
     lembrar_usuario = ft.Checkbox(label="Lembrar usuário", fill_color="white", label_style=ft.TextStyle(color="white"))
 
-    # Botão de envio
     botao_entrar = ft.ElevatedButton(
         text="Entrar",
         on_click=entrar_click,
@@ -86,10 +85,9 @@ def main(page: ft.Page):
             alignment=ft.MainAxisAlignment.CENTER,
             horizontal_alignment=ft.CrossAxisAlignment.CENTER,
             spacing=20,
-            width=400,  # Largura fixa para centralizar os elementos
+            width=400,  
         )
     )
 
-# Executar o aplicativo Flet
 if __name__ == "__main__":
     ft.app(target=main)
