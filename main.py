@@ -1,6 +1,7 @@
 import flet as ft
 
 def main(page: ft.Page):
+
     page.title = "Help Desk"
     page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
     page.vertical_alignment = ft.MainAxisAlignment.CENTER
@@ -10,15 +11,31 @@ def main(page: ft.Page):
         usuario = campo_usuario.value
         senha = campo_senha.value
 
-        if usuario == "admin" and senha == "1234":
-            mensagem.text = "Login bem-sucedido! Bem-vindo ao Help Desk!"
-            mensagem.color = "green"
+        if usuario and senha:
+            if usuario == "admin" and senha == "1234":  # Validação simples
+                snack_bar = ft.SnackBar(
+                    content=ft.Text("Login realizado com sucesso!"),
+                    bgcolor="green",
+                )
+                page.overlay.append(snack_bar)
+                snack_bar.open = True
+            else:
+                snack_bar = ft.SnackBar(
+                    content=ft.Text("Usuário ou senha incorretos!"),
+                    bgcolor="red",
+                )
+                page.overlay.append(snack_bar)
+                snack_bar.open = True
         else:
-            mensagem.text = "Usuário ou senha inválidos."
-            mensagem.color = "red"
+            snack_bar = ft.SnackBar(
+                content=ft.Text("Preencha todos os campos!"),
+                bgcolor="orange",
+            )
+            page.overlay.append(snack_bar)
+            snack_bar.open = True
+
         page.update()
 
-    # Logo do sistema
     logo = ft.Text(
         "Help Desk",
         size=30,
@@ -26,7 +43,6 @@ def main(page: ft.Page):
         color="white",
     )
 
-    # Campos de entrada (usuário e senha)
     campo_usuario = ft.TextField(
         label="Usuário",
         prefix_icon=ft.icons.PERSON,
@@ -47,8 +63,7 @@ def main(page: ft.Page):
         bgcolor="#34495E",
     )
 
-    # Checkbox para "Lembrar me"
-    lembrar_me = ft.Checkbox(label="Lembrar me", fill_color="white", label_style=ft.TextStyle(color="white"))
+    lembrar_usuario = ft.Checkbox(label="Lembrar usuário", fill_color="white", label_style=ft.TextStyle(color="white"))
 
     # Botão de envio
     botao_entrar = ft.ElevatedButton(
@@ -58,9 +73,6 @@ def main(page: ft.Page):
         color="white",
     )
 
-    # Mensagem de feedback
-    mensagem = ft.Text("", size=16)
-
     # Layout principal
     page.add(
         ft.Column(
@@ -68,9 +80,8 @@ def main(page: ft.Page):
                 logo,
                 campo_usuario,
                 campo_senha,
-                lembrar_me,
+                lembrar_usuario,
                 botao_entrar,
-                mensagem,
             ],
             alignment=ft.MainAxisAlignment.CENTER,
             horizontal_alignment=ft.CrossAxisAlignment.CENTER,
