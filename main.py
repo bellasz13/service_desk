@@ -1,24 +1,21 @@
 import flet as ft
+from inicial import InicialPage
+from novo_ticket import NovoTicketPage
+from faq import FAQPage
 
-def main(page: ft.Page):
-
-    page.title = "Help Desk"
+def LoginPage(page, on_login_success):
+    page.title = "Help Desk - Login"
+    page.bgcolor = "#2C3E50"
     page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
     page.vertical_alignment = ft.MainAxisAlignment.CENTER
-    page.bgcolor = "#2C3E50"
 
     def entrar_click(e):
         usuario = campo_usuario.value
         senha = campo_senha.value
 
         if usuario and senha:
-            if usuario == "admin" and senha == "1234":  
-                snack_bar = ft.SnackBar(
-                    content=ft.Text("Login realizado com sucesso!"),
-                    bgcolor="green",
-                )
-                page.overlay.append(snack_bar)
-                snack_bar.open = True
+            if usuario == "admin" and senha == "1234":
+                on_login_success({"usuario": usuario})
             else:
                 snack_bar = ft.SnackBar(
                     content=ft.Text("Usuário ou senha incorretos!"),
@@ -43,9 +40,10 @@ def main(page: ft.Page):
         color="white",
     )
 
+    global campo_usuario, campo_senha
     campo_usuario = ft.TextField(
         label="Usuário",
-        prefix_icon=ft.icons.PERSON,
+        prefix_icon=ft.Icons.PERSON,
         border_color="white",
         color="white",
         label_style=ft.TextStyle(color="white"),
@@ -54,7 +52,7 @@ def main(page: ft.Page):
     
     campo_senha = ft.TextField(
         label="Senha",
-        prefix_icon=ft.icons.LOCK,
+        prefix_icon=ft.Icons.LOCK,
         password=True,
         can_reveal_password=True,
         border_color="white",
@@ -72,7 +70,7 @@ def main(page: ft.Page):
         color="white",
     )
 
-    # Layout principal
+    page.controls.clear()
     page.add(
         ft.Column(
             [
@@ -89,5 +87,37 @@ def main(page: ft.Page):
         )
     )
 
-if __name__ == "__main__":
-    ft.app(target=main)
+def main(page: ft.Page):
+    page.title = "Help Desk"
+    page.vertical_alignment = ft.MainAxisAlignment.CENTER
+    page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
+    page.bgcolor = "#2C3E50"
+    
+    usuario_logado = None
+
+    def on_login_success(usuario):
+        nonlocal usuario_logado
+        usuario_logado = usuario
+        page.go("/inicial")
+
+    def route_change(route):
+        nonlocal usuario_logado
+
+        if page.route == "/":
+            LoginPage(page, on_login_success)
+        elif page.route == "/inicial":
+            if usuario_logado:
+                InicialPage(page)
+            else:
+                page.go("/")
+        elif page.route == "/novo_ticket":
+            NovoTicketPage(page)
+        elif page.route == "/faq":
+            FAQPage(page)
+        else:
+            LoginPage(page, on_login_success)
+
+    page.on_route_change = route_change
+    page.go("/")
+
+ft.app(target=main)
