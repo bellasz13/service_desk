@@ -21,16 +21,13 @@ def InicialPage(page: ft.Page):
         page.go("/pesquisa")
 
     def dashboard(e):
-        page.go("/inicial")
+        page.go("/dashboard")
 
     def tickets(e):
         page.go("/tickets")
 
-    def estatisticas(e):
-        page.go("/estatisticas")
-
-    def usuarios(e):
-        page.go("/usuarios")
+    def estatistica(e):
+        page.go("/estatistica")
 
     def admin(e):
         page.go("/admin")
@@ -41,11 +38,11 @@ def InicialPage(page: ft.Page):
     def novo_ticket(e):
         page.go("/novo_ticket")
 
-    def buscar_ticket(e):
-        page.go("/pesquisa")
-
     def faq(e):
         page.go("/faq")
+        
+    def notificacoes(e):
+        page.go("/notificacoes")
 
     def render_page():
     
@@ -60,7 +57,7 @@ def InicialPage(page: ft.Page):
                     ),
                     ft.Text("Help Desk", size=24, weight=ft.FontWeight.BOLD, color="#2C3E50"),
                     ft.Container(expand=True),
-                    ft.IconButton(ft.Icons.NOTIFICATIONS, icon_color="#2C3E50", tooltip="Notificações"),
+                    ft.IconButton(ft.Icons.NOTIFICATIONS, icon_color="#2C3E50", tooltip="Notificações", on_click=notificacoes),
                     ft.IconButton(ft.Icons.SEARCH, icon_color="#2C3E50", tooltip="Pesquisar", on_click=pesquisa),
                     ft.IconButton(ft.Icons.EXIT_TO_APP, icon_color="#2C3E50", tooltip="Sair", on_click=sair),
                 ],
@@ -88,12 +85,7 @@ def InicialPage(page: ft.Page):
                         ),
                         ft.Container(
                             ft.Row([ft.Icon(ft.Icons.PIE_CHART, color="white"), ft.Text("Estatísticas", color="white", size=16)]),
-                            on_click=estatisticas,
-                            padding=5
-                        ),
-                        ft.Container(
-                            ft.Row([ft.Icon(ft.Icons.PEOPLE, color="white"), ft.Text("Usuários", color="white", size=16)]),
-                            on_click=usuarios,
+                            on_click=estatistica,
                             padding=5
                         ),
                         ft.Container(
@@ -121,9 +113,8 @@ def InicialPage(page: ft.Page):
                 ft.Column(
                     [
                         ft.IconButton(icon=ft.Icons.DASHBOARD, tooltip="Dashboard", on_click=dashboard, icon_color="white"),
-                        ft.IconButton(icon=ft.Icons.CONTACT_SUPPORT, tooltip="Tickets", on_click=tickets, icon_color="white"),
-                        ft.IconButton(icon=ft.Icons.PIE_CHART, tooltip="Estatísticas", on_click=estatisticas, icon_color="white"),
-                        ft.IconButton(icon=ft.Icons.PEOPLE, tooltip="Usuários", on_click=usuarios, icon_color="white"),
+                        ft.IconButton(icon=ft.Icons.SUPPORT, tooltip="Tickets", on_click=tickets, icon_color="white"),
+                        ft.IconButton(icon=ft.Icons.PIE_CHART, tooltip="Estatísticas", on_click=estatistica, icon_color="white"),
                         ft.IconButton(icon=ft.Icons.ADMIN_PANEL_SETTINGS, tooltip="Admin", on_click=admin, icon_color="white"),
                         ft.Divider(color="#34495E"),
                         ft.IconButton(icon=ft.Icons.SETTINGS, tooltip="Configurações", on_click=configuracoes, icon_color="white"),
@@ -168,7 +159,6 @@ def InicialPage(page: ft.Page):
         quick_actions = ft.Row(
             [
                 ft.ElevatedButton(text="Novo Ticket", icon=ft.Icons.ADD, bgcolor="#2980B9", color="white", on_click=novo_ticket),
-                ft.ElevatedButton(text="Buscar Ticket", icon=ft.Icons.SEARCH, bgcolor="#27AE60", color="white", on_click=buscar_ticket),
                 ft.ElevatedButton(text="FAQ", icon=ft.Icons.HELP, bgcolor="#F39C12", color="white", on_click=faq),
             ],
             alignment=ft.MainAxisAlignment.CENTER,

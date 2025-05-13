@@ -2,6 +2,12 @@ import flet as ft
 from inicial import InicialPage
 from novo_ticket import NovoTicketPage
 from faq import FAQPage
+from dashboard import DashboardPage
+from tickets import TicketsPage
+from estatistica import EstatisticaPage
+from admin import AdminPage
+from notificacoes import NotificacoesPage
+from pesquisa import PesquisaPage
 
 def LoginPage(page, on_login_success):
     page.title = "Help Desk - Login"
@@ -114,6 +120,18 @@ def main(page: ft.Page):
             NovoTicketPage(page)
         elif page.route == "/faq":
             FAQPage(page)
+        elif page.route == "/dashboard":
+            DashboardPage(page)
+        elif page.route == "/tickets":
+            TicketsPage(page)
+        elif page.route == "/estatistica":
+            EstatisticaPage(page)
+        elif page.route == "/admin":
+            AdminPage(page)
+        elif page.route == "/notificacoes":
+            NotificacoesPage(page)
+        elif page.route == "/pesquisa":
+            PesquisaPage(page)
         else:
             LoginPage(page, on_login_success)
 
