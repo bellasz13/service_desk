@@ -8,6 +8,8 @@ from estatistica import EstatisticaPage
 from admin import AdminPage
 from notificacoes import NotificacoesPage
 from pesquisa import PesquisaPage
+from configuracoes import ConfiguracoesPage
+from biblioteca import BibliotecaPage
 
 def LoginPage(page, on_login_success):
     page.title = "Help Desk - Login"
@@ -132,6 +134,10 @@ def main(page: ft.Page):
             NotificacoesPage(page)
         elif page.route == "/pesquisa":
             PesquisaPage(page)
+        elif page.route == "/configuracoes":
+            ConfiguracoesPage(page)
+        elif page.route == "/biblioteca":
+            BibliotecaPage(page)
         else:
             LoginPage(page, on_login_success)
 

@@ -43,6 +43,9 @@ def InicialPage(page: ft.Page):
         
     def notificacoes(e):
         page.go("/notificacoes")
+    
+    def biblioteca(e):
+        page.go("/biblioteca")
 
     def render_page():
     
@@ -160,6 +163,7 @@ def InicialPage(page: ft.Page):
             [
                 ft.ElevatedButton(text="Novo Ticket", icon=ft.Icons.ADD, bgcolor="#2980B9", color="white", on_click=novo_ticket),
                 ft.ElevatedButton(text="FAQ", icon=ft.Icons.HELP, bgcolor="#F39C12", color="white", on_click=faq),
+                ft.ElevatedButton(text="Biblioteca", icon=ft.Icons.LIBRARY_ADD, bgcolor="#2980B9", on_click=biblioteca),
             ],
             alignment=ft.MainAxisAlignment.CENTER,
             spacing=20,
