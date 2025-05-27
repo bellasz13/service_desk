@@ -58,7 +58,7 @@ def AdminPage(page: ft.Page):
             render_lista_usuarios()
 
         def salvar_alteracoes(e):
-            # Atualiza os dados do usuário
+
             usuario["nome"] = nome_field.value
             usuario["usuario"] = usuario_field.value
             usuario["email"] = email_field.value
@@ -138,7 +138,6 @@ def AdminPage(page: ft.Page):
             expand=True
         )
 
-        # Novo usuário tab
         nome = ft.TextField(label="Nome", width=400, label_style=ft.TextStyle(color="#2C3E50"))
         usuario_nome = ft.TextField(label="Nome de Usuário", width=300, label_style=ft.TextStyle(color="#2C3E50"))
         email = ft.TextField(label="E-mail", width=400, label_style=ft.TextStyle(color="#2C3E50"))

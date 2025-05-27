@@ -10,6 +10,9 @@ from notificacoes import NotificacoesPage
 from pesquisa import PesquisaPage
 from configuracoes import ConfiguracoesPage
 from biblioteca import BibliotecaPage
+from user import UserPage
+from ticket_user import TicketUserPage
+from perfil_user import PerfilUserPage
 
 def LoginPage(page, on_login_success):
     page.title = "Help Desk - Login"
@@ -23,7 +26,9 @@ def LoginPage(page, on_login_success):
 
         if usuario and senha:
             if usuario == "admin" and senha == "1234":
-                on_login_success({"usuario": usuario})
+                on_login_success({"usuario": usuario, "tipo": "admin"})
+            elif usuario == "user" and senha == "1234":
+                on_login_success({"usuario": usuario, "tipo": "comum"})
             else:
                 snack_bar = ft.SnackBar(
                     content=ft.Text("Usuário ou senha incorretos!"),
@@ -106,7 +111,10 @@ def main(page: ft.Page):
     def on_login_success(usuario):
         nonlocal usuario_logado
         usuario_logado = usuario
-        page.go("/inicial")
+        if usuario["tipo"] == "admin":
+            page.go("/inicial")
+        elif usuario["tipo"] == "comum":
+            page.go("/user")
 
     def route_change(route):
         nonlocal usuario_logado
@@ -114,18 +122,30 @@ def main(page: ft.Page):
         if page.route == "/":
             LoginPage(page, on_login_success)
         elif page.route == "/inicial":
-            if usuario_logado:
+            if usuario_logado and usuario_logado.get("tipo") == "admin":
                 InicialPage(page)
             else:
                 page.go("/")
+        elif page.route == "/user":
+            if usuario_logado and usuario_logado.get("tipo") == "comum":
+                UserPage(page, usuario_logado)
+            else:
+                page.go("/")
+        elif page.route == "/meus_tickets":
+            if usuario_logado and usuario_logado.get("tipo") == "comum":
+                TicketUserPage(page, usuario_logado)
+            else:
+                page.go("/")
         elif page.route == "/novo_ticket":
-            NovoTicketPage(page)
+            NovoTicketPage(page, usuario_logado)
+        elif page.route == "/perfil":
+            PerfilUserPage(page, usuario_logado)
         elif page.route == "/faq":
             FAQPage(page)
         elif page.route == "/dashboard":
             DashboardPage(page)
         elif page.route == "/tickets":
-            TicketsPage(page)
+            TicketsPage(page, usuario_logado)
         elif page.route == "/estatistica":
             EstatisticaPage(page)
         elif page.route == "/admin":
@@ -137,7 +157,7 @@ def main(page: ft.Page):
         elif page.route == "/configuracoes":
             ConfiguracoesPage(page)
         elif page.route == "/biblioteca":
-            BibliotecaPage(page)
+            BibliotecaPage(page, usuario_logado)
         else:
             LoginPage(page, on_login_success)
 

@@ -1,10 +1,9 @@
 import flet as ft
 
-def BibliotecaPage(page: ft.Page):
+def BibliotecaPage(page: ft.Page, usuario_logado=None):
     page.title = "Base de Conhecimento"
     page.bgcolor = "#F4F6F7"
 
-    # Exemplos de dados (substitua por dados reais ou banco de dados)
     faqs = [
         {"pergunta": "Como redefinir minha senha?", "resposta": "Acesse a tela de login, clique em 'Esqueci minha senha' e siga as instruções."},
         {"pergunta": "Como abrir um chamado?", "resposta": "Clique em 'Novo Ticket' no menu lateral e preencha o formulário."},
@@ -39,7 +38,6 @@ def BibliotecaPage(page: ft.Page):
     ]
     feedbacks = []
 
-    # Categorias para busca avançada
     categorias = [
         "FAQs", "Tutoriais", "Dicas", "Manuais", "Artigos Técnicos", "Materiais Multimídia"
     ]
@@ -194,8 +192,6 @@ def BibliotecaPage(page: ft.Page):
                         elevation=2
                     )
                 )
-
-        # Feedback e botão para abrir ticket
         resultado.controls.append(
             ft.Container(
                 ft.Row([
@@ -218,9 +214,15 @@ def BibliotecaPage(page: ft.Page):
 
     atualizar_lista()
 
+    def voltar(e):
+        if usuario_logado and usuario_logado.get("tipo") == "admin":
+            page.go("/inicial")
+        else:
+            page.go("/user")
+
     cabecalho = ft.Container(
         ft.Row([
-            ft.IconButton(icon=ft.Icons.ARROW_BACK, icon_color="#7F8C8D", on_click=lambda e: page.go("/inicial")),
+            ft.IconButton(icon=ft.Icons.ARROW_BACK, icon_color="#7F8C8D", on_click=voltar),
             ft.Text("Base de Conhecimento", size=22, weight=ft.FontWeight.BOLD, color="#2C3E50"),
         ], alignment=ft.MainAxisAlignment.START),
         padding=ft.padding.symmetric(horizontal=20, vertical=10),

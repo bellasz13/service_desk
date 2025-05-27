@@ -1,9 +1,7 @@
 import flet as ft
-import csv
-import io
 
-def TicketsPage(page: ft.Page, usuario_logado):
-    page.title = "Tickets - Help Desk"
+def TicketUserPage(page: ft.Page, usuario_logado):
+    page.title = "Meus Tickets - Help Desk"
     page.bgcolor = "#F4F6F7"
 
     tickets = [
@@ -16,6 +14,7 @@ def TicketsPage(page: ft.Page, usuario_logado):
             "urgencia": "Alta",
             "sla": "4 horas",
             "data": "2024-05-10",
+            "criador": "user",
             "respostas": [
                 {"autor": "Agente", "mensagem": "Estamos analisando o problema.", "data": "2024-05-10 10:00"}
             ]
@@ -29,6 +28,7 @@ def TicketsPage(page: ft.Page, usuario_logado):
             "urgencia": "Normal",
             "sla": "24 horas",
             "data": "2024-05-08",
+            "criador": "user",
             "respostas": [
                 {"autor": "Financeiro", "mensagem": "Reembolso realizado.", "data": "2024-05-09 09:00"}
             ]
@@ -42,17 +42,7 @@ def TicketsPage(page: ft.Page, usuario_logado):
             "urgencia": "Baixa",
             "sla": "72 horas",
             "data": "2024-05-07",
-            "respostas": []
-        },
-        {
-            "id": 104,
-            "titulo": "Dúvida sobre nota fiscal",
-            "status": "Aberto",
-            "prioridade": "Média",
-            "categoria": "Financeiro",
-            "urgencia": "Normal",
-            "sla": "24 horas",
-            "data": "2024-05-06",
+            "criador": "user",
             "respostas": []
         },
     ]
@@ -77,7 +67,7 @@ def TicketsPage(page: ft.Page, usuario_logado):
         on_submit=lambda e: render_lista_tickets(),
         label_style=ft.TextStyle(color="#2C3E50")
     )
-
+    
     anexo = ft.FilePicker()
     anexo_button = ft.ElevatedButton(
         "Anexar Arquivo",
@@ -86,27 +76,8 @@ def TicketsPage(page: ft.Page, usuario_logado):
     )
     page.overlay.append(anexo)
 
-    def exportar_incidentes(e):
-        output = io.StringIO()
-        writer = csv.writer(output)
-        writer.writerow(["ID", "Título", "Status", "Prioridade", "Urgência", "SLA", "Categoria", "Data"])
-        for t in tickets:
-            writer.writerow([
-                t.get("id", ""),
-                t.get("titulo", ""),
-                t.get("status", ""),
-                t.get("prioridade", ""),
-                t.get("urgencia", ""),
-                t.get("sla", ""),
-                t.get("categoria", ""),
-                t.get("data", "")
-            ])
-        output.seek(0)
-        conteudo = output.getvalue()
-        page.launch_url("data:text/csv;charset=utf-8," + conteudo)
-
     def voltar(e):
-        page.go("/inicial")
+        page.go("/user")
 
     def novo_ticket(e):
         page.go("/novo_ticket")
@@ -118,24 +89,6 @@ def TicketsPage(page: ft.Page, usuario_logado):
         def voltar_lista(e):
             render_lista_tickets()
 
-        def fechar_ticket(e):
-            ticket["status"] = "Fechado"
-            page.snack_bar = ft.SnackBar(
-                ft.Text("Ticket fechado com sucesso!", color="#2C3E50"),
-                bgcolor="#27AE60"
-            )
-            page.snack_bar.open = True
-            render_detalhe_ticket(ticket)
-
-        def em_espera_ticket(e):
-            ticket["status"] = "Em Espera"
-            page.snack_bar = ft.SnackBar(
-                ft.Text("Ticket colocado em espera!", color="#2C3E50"),
-                bgcolor="#F39C12"
-            )
-            page.snack_bar.open = True
-            render_detalhe_ticket(ticket)
-
         resposta_field = ft.TextField(
             label="Adicionar resposta",
             multiline=True,
@@ -145,78 +98,11 @@ def TicketsPage(page: ft.Page, usuario_logado):
             label_style=ft.TextStyle(color="#2C3E50")
         )
 
-        prioridade_field = ft.Dropdown(
-            label="Prioridade",
-            width=180,
-            options=[
-                ft.dropdown.Option("Baixa"),
-                ft.dropdown.Option("Média"),
-                ft.dropdown.Option("Alta"),
-                ft.dropdown.Option("Crítica"),
-            ],
-            value=ticket["prioridade"],
-            color="black",
-            label_style=ft.TextStyle(color="#2C3E50")
-        )
-        categoria_field = ft.Dropdown(
-            label="Categoria",
-            width=180,
-            options=[
-                ft.dropdown.Option("Suporte Técnico"),
-                ft.dropdown.Option("Financeiro"),
-                ft.dropdown.Option("Infraestrutura"),
-                ft.dropdown.Option("Outro"),
-            ],
-            value=ticket["categoria"],
-            color="black",
-            label_style=ft.TextStyle(color="#2C3E50")
-        )
-        urgencia_field = ft.Dropdown(
-            label="Urgência",
-            width=180,
-            options=[
-                ft.dropdown.Option("Baixa"),
-                ft.dropdown.Option("Normal"),
-                ft.dropdown.Option("Alta"),
-                ft.dropdown.Option("Imediata"),
-            ],
-            value=ticket["urgencia"],
-            color="black",
-            label_style=ft.TextStyle(color="#2C3E50")
-        )
-        sla_field = ft.Dropdown(
-            label="SLA",
-            width=180,
-            options=[
-                ft.dropdown.Option("2 horas"),
-                ft.dropdown.Option("4 horas"),
-                ft.dropdown.Option("8 horas"),
-                ft.dropdown.Option("12 horas"),
-                ft.dropdown.Option("24 horas"),
-                ft.dropdown.Option("72 horas"),
-            ],
-            value=ticket["sla"],
-            color="black",
-            label_style=ft.TextStyle(color="#2C3E50")
-        )
-
-        def salvar_alteracoes(e):
-            ticket["prioridade"] = prioridade_field.value
-            ticket["categoria"] = categoria_field.value
-            ticket["urgencia"] = urgencia_field.value
-            ticket["sla"] = sla_field.value
-            page.snack_bar = ft.SnackBar(
-                ft.Text("Alterações salvas!", color="#2C3E50"),
-                bgcolor="#27AE60"
-            )
-            page.snack_bar.open = True
-            render_detalhe_ticket(ticket)
-
         def adicionar_resposta(e):
             texto = resposta_field.value.strip()
             if texto:
                 ticket["respostas"].append({
-                    "autor": "Você",
+                    "autor": usuario_logado["user"],
                     "mensagem": texto,
                     "data": "Agora"
                 })
@@ -229,7 +115,10 @@ def TicketsPage(page: ft.Page, usuario_logado):
                 render_detalhe_ticket(ticket)
 
         cor_status = {"Aberto": "#27AE60", "Fechado": "#AAB7B8", "Em Espera": "#F39C12"}.get(ticket["status"], "#7F8C8D")
-        cor_prioridade = "#2980B9" if ticket["prioridade"] == "Alta" else "#27AE60" if ticket["prioridade"] == "Média" else "#F39C12"
+        cor_prioridade = {"Baixa": "#27AE60", "Média": "#2980B9", "Alta": "#2980B9", "Crítica": "#C0392B"}.get(ticket["prioridade"], "#7F8C8D")
+        cor_categoria = "#566573"
+        cor_urgencia = "#C0392B"
+        cor_sla = "#8E44AD"
 
         respostas_list = ft.Column([
             ft.Container(
@@ -244,44 +133,6 @@ def TicketsPage(page: ft.Page, usuario_logado):
             )
             for r in ticket["respostas"]
         ], spacing=8)
-
-        botoes = [
-            anexo_button,
-            ft.ElevatedButton(
-                "Adicionar Resposta",
-                icon=ft.Icons.SEND,
-                bgcolor="#2980B9",
-                color="white",
-                on_click=adicionar_resposta,
-                disabled=ticket["status"] == "Fechado"
-            ),
-            ft.ElevatedButton(
-                "Salvar Alterações",
-                icon=ft.Icons.SAVE,
-                bgcolor="#27AE60",
-                color="white",
-                on_click=salvar_alteracoes
-            ),
-            ft.ElevatedButton(
-                "Fechar Ticket",
-                icon=ft.Icons.LOCK,
-                bgcolor="#AAB7B8",
-                color="white",
-                on_click=fechar_ticket,
-                disabled=ticket["status"] == "Fechado"
-            )
-        ]
-
-        if ticket["status"] != "Fechado" and ticket["status"] != "Em Espera":
-            botoes.append(
-                ft.ElevatedButton(
-                    "Deixar em Espera",
-                    icon=ft.Icons.PAUSE_CIRCLE,
-                    bgcolor="#F39C12",
-                    color="white",
-                    on_click=em_espera_ticket
-                )
-            )
 
         page.controls.clear()
         page.add(
@@ -307,30 +158,50 @@ def TicketsPage(page: ft.Page, usuario_logado):
                             border_radius=6,
                         ),
                         ft.Container(
-                            ft.Text(ticket["categoria"], color="#2C3E50", size=12),
-                            padding=ft.padding.symmetric(horizontal=8, vertical=2),
+                            ft.Text(ticket["categoria"], color="white", size=12),
+                            bgcolor=cor_categoria,
+                            padding=ft.padding.symmetric(horizontal=12, vertical=6),
+                            border_radius=8,
+                            margin=ft.margin.only(right=6)
+                        ),
+                        ft.Container(
+                            ft.Text(f'Urgência: {ticket.get("urgencia", "-")}', color="white", size=12),
+                            bgcolor=cor_urgencia,
+                            padding=ft.padding.symmetric(horizontal=12, vertical=6),
+                            border_radius=8,
+                            margin=ft.margin.only(right=6)
+                        ),
+                        ft.Container(
+                            ft.Text(f'SLA: {ticket.get("sla", "-")}', color="white", size=12),
+                            bgcolor=cor_sla,
+                            padding=ft.padding.symmetric(horizontal=12, vertical=6),
+                            border_radius=8,
+                            margin=ft.margin.only(right=6)
                         ),
                         ft.Text(ticket["data"], size=12, color="#7F8C8D"),
                     ], alignment=ft.MainAxisAlignment.START, spacing=10),
-                    ft.Divider(),
-                    ft.Row([
-                        prioridade_field,
-                        categoria_field,
-                        urgencia_field,
-                        sla_field
-                    ], spacing=10),
                     ft.Divider(),
                     ft.Text("Respostas:", size=16, weight=ft.FontWeight.BOLD, color="#2C3E50"),
                     respostas_list if ticket["respostas"] else ft.Text("Nenhuma resposta ainda.", color="#2C3E50"),
                     ft.Divider(),
                     resposta_field if ticket["status"] != "Fechado" else ft.Text("Ticket fechado. Não é possível responder.", color="#AAB7B8"),
-                    ft.Row(botoes, spacing=20)
+                    ft.Row([
+                        anexo_button,
+                        ft.ElevatedButton(
+                            "Adicionar Resposta",
+                            icon=ft.Icons.SEND,
+                            bgcolor="#2980B9",
+                            color="white",
+                            on_click=adicionar_resposta,
+                            disabled=ticket["status"] == "Fechado"
+                        ),
+                    ], spacing=20)
                 ], spacing=18),
                 padding=30,
                 bgcolor="white",
                 border_radius=12,
                 margin=ft.margin.all(30),
-                width=900,
+                width=700,
                 alignment=ft.alignment.top_center
             )
         )
@@ -340,9 +211,11 @@ def TicketsPage(page: ft.Page, usuario_logado):
         lista_tickets = ft.Column(spacing=0, expand=True)
         status = filtro_status.value
         termo = busca.value.lower()
+
         filtrados = [
             t for t in tickets
-            if (status == "Todos" or t["status"] == status)
+            if t["criador"] == usuario_logado["usuario"]
+            and (status == "Todos" or t["status"] == status)
             and (termo in t["titulo"].lower() or termo in str(t["id"]))
         ]
         for t in filtrados:
@@ -375,6 +248,16 @@ def TicketsPage(page: ft.Page, usuario_logado):
                                         padding=ft.padding.symmetric(horizontal=8, vertical=2),
                                         margin=ft.margin.only(left=10)
                                     ),
+                                    ft.Container(
+                                        ft.Text(f'Urgência: {t.get("urgencia", "-")}', color="#C0392B", size=12),
+                                        padding=ft.padding.symmetric(horizontal=8, vertical=2),
+                                        margin=ft.margin.only(left=10)
+                                    ),
+                                    ft.Container(
+                                        ft.Text(f'SLA: {t.get("sla", "-")}', color="#8E44AD", size=12),
+                                        padding=ft.padding.symmetric(horizontal=8, vertical=2),
+                                        margin=ft.margin.only(left=10)
+                                    ),
                                     ft.Text(t["data"], size=12, color="#7F8C8D"),
                                 ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
                             ], spacing=8),
@@ -387,14 +270,6 @@ def TicketsPage(page: ft.Page, usuario_logado):
                     )
                 )
             )
-
-        exportar_button = ft.ElevatedButton(
-            "Exportar Incidentes",
-            icon=ft.Icons.DOWNLOAD,
-            on_click=exportar_incidentes,
-            bgcolor="#2980B9",
-            color="white"
-        )
 
         cabecalho = ft.Container(
             content=ft.Row(
@@ -419,7 +294,6 @@ def TicketsPage(page: ft.Page, usuario_logado):
                         color="white",
                         on_click=novo_ticket,
                     ),
-                    exportar_button
                 ],
                 alignment=ft.MainAxisAlignment.CENTER,
             ),

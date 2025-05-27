@@ -7,34 +7,29 @@ def ConfiguracoesPage(page: ft.Page):
     def voltar(e):
         page.go("/inicial")
 
-    # --- Canais de Suporte ---
+    # canais de suporte
     canal_email = ft.Switch(label="Ativar suporte por E-mail", value=True, label_style=ft.TextStyle(color="#2C3E50"))
     canal_chat = ft.Switch(label="Ativar suporte por Chat", value=True, label_style=ft.TextStyle(color="#2C3E50"))
     canal_form = ft.Switch(label="Ativar suporte por Formulário", value=False, label_style=ft.TextStyle(color="#2C3E50"))
     canal_telefone = ft.Switch(label="Ativar suporte por Telefone", value=False, label_style=ft.TextStyle(color="#2C3E50"))
     email_suporte = ft.TextField(label="E-mail do suporte", value="suporte@empresa.com", width=350, label_style=ft.TextStyle(color="#2C3E50"))
 
-    # --- Usuários & Permissões ---
+    # usuários e permissões
     permissao_admin = ft.Checkbox(label="Administrador pode criar usuários", value=True, label_style=ft.TextStyle(color="#2C3E50"))
     permissao_agente = ft.Checkbox(label="Agente pode fechar tickets", value=True, label_style=ft.TextStyle(color="#2C3E50"))
     permissao_usuario = ft.Checkbox(label="Usuário pode reabrir ticket fechado", value=False, label_style=ft.TextStyle(color="#2C3E50"))
 
-    # --- SLAs ---
-    sla_prazo_resposta = ft.TextField(label="Prazo máximo de resposta (horas)", value="4", width=120, label_style=ft.TextStyle(color="#2C3E50"))
-    sla_prazo_solucao = ft.TextField(label="Prazo máximo de solução (horas)", value="24", width=120, label_style=ft.TextStyle(color="#2C3E50"))
-    sla_critico = ft.TextField(label="Prazo solução crítico (horas)", value="2", width=120, label_style=ft.TextStyle(color="#2C3E50"))
-
-    # --- Base de Conhecimento ---
+    # base de conhecimento
     base_publica = ft.Switch(label="Base de conhecimento pública", value=True, label_style=ft.TextStyle(color="#2C3E50"))
     artigo_aprovacao = ft.Checkbox(label="Artigos precisam de aprovação", value=True, label_style=ft.TextStyle(color="#2C3E50"))
     artigo_notificacao = ft.Switch(label="Notificar agentes sobre novos artigos", value=True, label_style=ft.TextStyle(color="#2C3E50"))
 
-    # --- Tickets ---
+    # tickets
     categorias = ft.TextField(label="Categorias (separe por vírgula)", value="Suporte Técnico, Financeiro, Infraestrutura, Outro", width=400, label_style=ft.TextStyle(color="#2C3E50"))
     prioridades = ft.TextField(label="Prioridades (separe por vírgula)", value="Baixa, Média, Alta, Crítica", width=400, label_style=ft.TextStyle(color="#2C3E50"))
     status = ft.TextField(label="Status disponíveis (separe por vírgula)", value="Aberto, Em Espera, Fechado, Atribuído", width=400, label_style=ft.TextStyle(color="#2C3E50"))
 
-    # --- Notificações ---
+    # notificações
     notifica_email = ft.Switch(label="Notificar por e-mail", value=True, label_style=ft.TextStyle(color="#2C3E50"))
     notifica_push = ft.Switch(label="Notificar por push", value=False, label_style=ft.TextStyle(color="#2C3E50"))
     notifica_cliente = ft.Checkbox(label="Enviar notificações também para clientes", value=True, label_style=ft.TextStyle(color="#2C3E50"))
@@ -82,17 +77,6 @@ def ConfiguracoesPage(page: ft.Page):
                     permissao_admin,
                     permissao_agente,
                     permissao_usuario,
-                ], spacing=10)
-            ),
-            ft.Tab(
-                text="SLAs",
-                content=ft.Column([
-                    ft.Text("Defina prazos máximos para resposta e solução.", color="#2C3E50"),
-                    ft.Row([
-                        sla_prazo_resposta,
-                        sla_prazo_solucao,
-                        sla_critico,
-                    ], spacing=20),
                 ], spacing=10)
             ),
             ft.Tab(
