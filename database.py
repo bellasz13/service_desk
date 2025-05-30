@@ -325,7 +325,7 @@ def tickets_por_dia_e_status():
                 GROUP BY dia, status
             """)
             for dia, status, count in cursor.fetchall():
-                idx = (dia + 5) % 7  # MySQL: 1=Dom, 2=Seg... ajusta para 0=Seg
+                idx = (dia + 5) % 7  
                 if status == "Aberto":
                     abertos[idx] = count
                 elif status == "Fechado":
@@ -399,7 +399,7 @@ def pesquisar_usuarios(termo):
     return usuarios
 
 def pesquisar_categorias(termo):
-    # Supondo que as categorias estão fixas, pode ser uma lista, ou se estiverem em tabela, adapte:
+
     categorias = [
         "Novo cadastro", "Alterar cadastro", "Liberar acesso", "Cancelar cadastro/acesso",
         "Alterar senha", "Problemas com Office 365", "Suporte ao Office 365", "Suporte a impressora",

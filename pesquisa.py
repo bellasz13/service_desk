@@ -1,7 +1,7 @@
 import flet as ft
 from database import pesquisar_tickets, pesquisar_usuarios, pesquisar_categorias, buscar_respostas_ticket, inserir_resposta
 
-def PesquisaPage(page: ft.Page, usuario_logado=None):  # Passe usuario_logado se quiser permitir respostas
+def PesquisaPage(page: ft.Page, usuario_logado=None):  
     page.title = "Pesquisa - Help Desk"
     page.bgcolor = "#F4F6F7"
 

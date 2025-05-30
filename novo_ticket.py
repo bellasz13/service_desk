@@ -180,7 +180,6 @@ def NovoTicketPage(page: ft.Page, usuario_logado):
         sla_valor = sla.value
 
         try:
-            # 1. Cria o ticket e obtém o id
             id_ticket = inserir_ticket(
                 titulo.value,
                 descricao.value,
@@ -194,7 +193,6 @@ def NovoTicketPage(page: ft.Page, usuario_logado):
                 usuario_logado["id_usuario"]
             )
 
-            # 2. Se houver anexo, salva o arquivo e registra no banco
             if anexo_arquivo.get("file"):
                 file_obj = anexo_arquivo["file"]
                 nome_arquivo = file_obj.name
@@ -212,7 +210,7 @@ def NovoTicketPage(page: ft.Page, usuario_logado):
                 bgcolor="green"
             )
             page.snack_bar.open = True
-            # Limpa os campos
+            
             titulo.value = ""
             descricao.value = ""
             prioridade.value = "Média"

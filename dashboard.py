@@ -19,11 +19,9 @@ def DashboardPage(page: ft.Page):
     def faq(e):
         page.go("/faq")
 
-    # --- DADOS DO BANCO ---
     dias, chamados_abertos, chamados_fechados = tickets_por_dia_e_status()
     resumo = contar_tickets_status()
 
-    # --- GRÁFICO ---
     fig, ax = plt.subplots(figsize=(6, 3))
     ax.plot(dias, chamados_abertos, label="Abertos", marker="o", color="#FF6347")
     ax.plot(dias, chamados_fechados, label="Fechados", marker="o", color="#2ECC71")

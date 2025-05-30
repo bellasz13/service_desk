@@ -87,9 +87,9 @@ def TicketUserPage(page: ft.Page, usuario_logado):
             if os.path.isfile(abs_path):
                 if platform.system() == "Windows":
                     os.startfile(abs_path)
-                elif platform.system() == "Darwin":  # macOS
+                elif platform.system() == "Darwin":  #mac
                     subprocess.run(["open", abs_path])
-                else:  # Linux
+                else:  #linux
                     subprocess.run(["xdg-open", abs_path])
             else:
                 print(f"Arquivo não encontrado: {abs_path}")
