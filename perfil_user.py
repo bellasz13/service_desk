@@ -1,4 +1,5 @@
 import flet as ft
+from database import buscar_usuario_por_id
 
 def PerfilUserPage(page: ft.Page, usuario_logado):
     page.title = "Meu Perfil"
@@ -6,6 +7,8 @@ def PerfilUserPage(page: ft.Page, usuario_logado):
 
     def voltar(e):
         page.go("/user")
+        
+    usuario = buscar_usuario_por_id(usuario_logado["id_usuario"])
 
     cabecalho = ft.Container(
         ft.Row([
@@ -21,10 +24,10 @@ def PerfilUserPage(page: ft.Page, usuario_logado):
         ft.Column(
             [
                 ft.Text("Dados do Usuário", size=18, weight=ft.FontWeight.BOLD, color="#2C3E50"),
-                ft.Text(f"Nome: {usuario_logado.get('nome', 'Usuário')}", size=16, color="#2C3E50"),
-                ft.Text(f"Nome de Usuário: {usuario_logado.get('usuario', 'user')}", size=16, color="#2C3E50"),
-                ft.Text(f"E-mail: {usuario_logado.get('email', 'user@empresa.com')}", size=16, color="#2C3E50"),
-                ft.Text(f"Tipo: {usuario_logado.get('tipo', 'Usuário')}", size=16, color="#2C3E50"),
+                ft.Text(f"Nome: {usuario.get('nome_completo', 'Usuário')}", size=16, color="#2C3E50"),
+                ft.Text(f"Nome de Usuário: {usuario.get('nome_usuario', 'user')}", size=16, color="#2C3E50"),
+                ft.Text(f"E-mail: {usuario.get('email', 'user@empresa.com')}", size=16, color="#2C3E50"),
+                ft.Text(f"Tipo: {usuario.get('tipo_usuario', 'Usuário')}", size=16, color="#2C3E50"),
             ],
             alignment=ft.MainAxisAlignment.START,
             spacing=20

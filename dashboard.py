@@ -1,6 +1,7 @@
 import flet as ft
 import matplotlib.pyplot as plt
 from flet.matplotlib_chart import MatplotlibChart
+from database import tickets_por_dia_e_status, contar_tickets_status
 
 def DashboardPage(page: ft.Page):
     page.title = "Dashboard - Help Desk"
@@ -18,16 +19,18 @@ def DashboardPage(page: ft.Page):
     def faq(e):
         page.go("/faq")
 
-    dias = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sab", "Dom"]
-    chamados_abertos = [5, 3, 6, 4, 7, 2, 5]
-    chamados_fechados = [2, 4, 3, 5, 6, 1, 3]
+    # --- DADOS DO BANCO ---
+    dias, chamados_abertos, chamados_fechados = tickets_por_dia_e_status()
+    resumo = contar_tickets_status()
+
+    # --- GRÁFICO ---
     fig, ax = plt.subplots(figsize=(6, 3))
     ax.plot(dias, chamados_abertos, label="Abertos", marker="o", color="#FF6347")
     ax.plot(dias, chamados_fechados, label="Fechados", marker="o", color="#2ECC71")
     ax.set_title("Chamados na Última Semana")
     ax.set_xlabel("Dia")
     ax.set_ylabel("Quantidade")
-    ax.set_ylim(0, max(chamados_abertos + chamados_fechados) + 2)
+    ax.set_ylim(0, max(chamados_abertos + chamados_fechados + [1]) + 2)
     ax.grid(True, linestyle="--", alpha=0.4)
     ax.legend()
     chart = MatplotlibChart(fig, expand=False)
@@ -37,28 +40,28 @@ def DashboardPage(page: ft.Page):
             ft.Container(
                 ft.Column([
                     ft.Text("Atribuídos", size=16, weight=ft.FontWeight.BOLD, color="#2C3E50"),
-                    ft.Text("5", size=32, weight=ft.FontWeight.BOLD, color="#2980B9"),
+                    ft.Text(str(resumo["atribuidos"]), size=32, weight=ft.FontWeight.BOLD, color="#2980B9"),
                 ], alignment=ft.MainAxisAlignment.CENTER),
                 width=170, height=100, bgcolor="#D6EAF8", border_radius=10, padding=20
             ),
             ft.Container(
                 ft.Column([
                     ft.Text("Novos", size=16, weight=ft.FontWeight.BOLD, color="#2C3E50"),
-                    ft.Text("2", size=32, weight=ft.FontWeight.BOLD, color="#27AE60"),
+                    ft.Text(str(resumo["novos"]), size=32, weight=ft.FontWeight.BOLD, color="#27AE60"),
                 ], alignment=ft.MainAxisAlignment.CENTER),
                 width=170, height=100, bgcolor="#D5F5E3", border_radius=10, padding=20
             ),
             ft.Container(
                 ft.Column([
                     ft.Text("Em Espera", size=16, weight=ft.FontWeight.BOLD, color="#2C3E50"),
-                    ft.Text("1", size=32, weight=ft.FontWeight.BOLD, color="#F39C12"),
+                    ft.Text(str(resumo["em_espera"]), size=32, weight=ft.FontWeight.BOLD, color="#F39C12"),
                 ], alignment=ft.MainAxisAlignment.CENTER),
                 width=170, height=100, bgcolor="#FCF3CF", border_radius=10, padding=20
             ),
             ft.Container(
                 ft.Column([
                     ft.Text("Fechados", size=16, weight=ft.FontWeight.BOLD, color="#2C3E50"),
-                    ft.Text("12", size=32, weight=ft.FontWeight.BOLD, color="#AAB7B8"),
+                    ft.Text(str(resumo["fechados"]), size=32, weight=ft.FontWeight.BOLD, color="#AAB7B8"),
                 ], alignment=ft.MainAxisAlignment.CENTER),
                 width=170, height=100, bgcolor="#EBEDEF", border_radius=10, padding=20
             ),

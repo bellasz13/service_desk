@@ -1,14 +1,9 @@
 import flet as ft
+from database import buscar_usuarios, inserir_usuario, atualizar_usuario, excluir_usuario
 
 def AdminPage(page: ft.Page):
     page.title = "Administração - Help Desk"
     page.bgcolor = "#F4F6F7"
-
-    usuarios = [
-        {"nome": "Ana Souza", "usuario": "ana.souza", "email": "ana@empresa.com", "tipo": "Administrador", "senha": "123456"},
-        {"nome": "Carlos Lima", "usuario": "carlos.lima", "email": "carlos@empresa.com", "tipo": "Usuário", "senha": "abc123"},
-        {"nome": "Maria Silva", "usuario": "maria.silva", "email": "maria@empresa.com", "tipo": "Usuário", "senha": "senha321"},
-    ]
 
     tabs_ref = ft.Ref[ft.Tabs]()
 
@@ -39,17 +34,17 @@ def AdminPage(page: ft.Page):
     )
 
     def render_usuario_detalhe(usuario):
-        nome_field = ft.TextField(label="Nome", value=usuario["nome"], width=400, label_style=ft.TextStyle(color="#2C3E50"))
-        usuario_field = ft.TextField(label="Nome de Usuário", value=usuario["usuario"], width=300, label_style=ft.TextStyle(color="#2C3E50"))
+        nome_field = ft.TextField(label="Nome", value=usuario["nome_completo"], width=400, label_style=ft.TextStyle(color="#2C3E50"))
+        usuario_field = ft.TextField(label="Nome de Usuário", value=usuario["nome_usuario"], width=300, label_style=ft.TextStyle(color="#2C3E50"))
         email_field = ft.TextField(label="E-mail", value=usuario["email"], width=400, label_style=ft.TextStyle(color="#2C3E50"))
         tipo_field = ft.Dropdown(
             label="Tipo de Usuário",
             width=200,
             options=[
-                ft.dropdown.Option("Administrador"),
-                ft.dropdown.Option("Usuário"),
+                ft.dropdown.Option("administrador"),
+                ft.dropdown.Option("comum"),
             ],
-            value=usuario["tipo"],
+            value=usuario["tipo_usuario"],
             label_style=ft.TextStyle(color="#2C3E50")
         )
         senha_field = ft.TextField(label="Nova Senha", password=True, can_reveal_password=True, width=300, label_style=ft.TextStyle(color="#2C3E50"))
@@ -58,20 +53,36 @@ def AdminPage(page: ft.Page):
             render_lista_usuarios()
 
         def salvar_alteracoes(e):
-
-            usuario["nome"] = nome_field.value
-            usuario["usuario"] = usuario_field.value
-            usuario["email"] = email_field.value
-            usuario["tipo"] = tipo_field.value
-            if senha_field.value:
-                usuario["senha"] = senha_field.value
-                senha_field.value = ""
+            atualizar_usuario(
+                usuario["id_usuario"],
+                nome_field.value,
+                usuario_field.value,
+                email_field.value,
+                tipo_field.value,
+                senha_field.value if senha_field.value else None
+            )
+            senha_field.value = ""
             page.snack_bar = ft.SnackBar(
                 ft.Text("Dados alterados com sucesso!", color="#2C3E50"),
                 bgcolor="green"
             )
             page.snack_bar.open = True
-            page.update()
+            render_usuario_detalhe({
+                "id_usuario": usuario["id_usuario"],
+                "nome_completo": nome_field.value,
+                "nome_usuario": usuario_field.value,
+                "email": email_field.value,
+                "tipo_usuario": tipo_field.value
+            })
+
+        def excluir_usuario_click(e):
+            excluir_usuario(usuario["id_usuario"])
+            page.snack_bar = ft.SnackBar(
+                ft.Text("Usuário excluído!", color="#2C3E50"),
+                bgcolor="#E74C3C"
+            )
+            page.snack_bar.open = True
+            render_lista_usuarios()
 
         page.controls.clear()
         page.add(
@@ -79,7 +90,7 @@ def AdminPage(page: ft.Page):
                 ft.Column([
                     ft.Row([
                         ft.IconButton(icon=ft.Icons.ARROW_BACK, icon_color="#7F8C8D", on_click=voltar_lista),
-                        ft.Text(f"Usuário: {usuario['nome']}", size=22, weight=ft.FontWeight.BOLD, color="#2C3E50"),
+                        ft.Text(f"Usuário: {usuario['nome_completo']}", size=22, weight=ft.FontWeight.BOLD, color="#2C3E50"),
                     ], alignment=ft.MainAxisAlignment.START),
                     ft.Divider(),
                     nome_field,
@@ -87,19 +98,29 @@ def AdminPage(page: ft.Page):
                     email_field,
                     tipo_field,
                     senha_field,
-                    ft.ElevatedButton("Salvar Alterações", icon=ft.Icons.SAVE, bgcolor="#2980B9", color="white", on_click=salvar_alteracoes),
+                    ft.Row([
+                        ft.ElevatedButton("Salvar Alterações", icon=ft.Icons.SAVE, bgcolor="#2980B9", color="white", on_click=salvar_alteracoes),
+                        ft.ElevatedButton(
+                            "Excluir usuário",
+                            icon=ft.Icons.DELETE,
+                            bgcolor="#E74C3C",
+                            color="white",
+                            on_click=excluir_usuario_click
+                        ),
+                    ], spacing=20),
                 ], spacing=18),
                 padding=30,
                 bgcolor="white",
                 border_radius=12,
                 margin=ft.margin.all(30),
-                width=500,
+                width=700,
                 alignment=ft.alignment.top_center
             )
         )
         page.update()
 
     def render_lista_usuarios():
+        usuarios = buscar_usuarios()
         lista = ft.Column(spacing=0, expand=True)
         for u in usuarios:
             lista.controls.append(
@@ -108,12 +129,12 @@ def AdminPage(page: ft.Page):
                     content=ft.Card(
                         ft.Container(
                             ft.Row([
-                                ft.Text(u["nome"], size=16, weight=ft.FontWeight.BOLD, color="#2C3E50"),
-                                ft.Text(u["usuario"], size=14, color="#27AE60"),
+                                ft.Text(u["nome_completo"], size=16, weight=ft.FontWeight.BOLD, color="#2C3E50"),
+                                ft.Text(u["nome_usuario"], size=14, color="#27AE60"),
                                 ft.Text(u["email"], size=14, color="#7F8C8D"),
                                 ft.Container(
-                                    ft.Text(u["tipo"], color="white", size=12),
-                                    bgcolor="#2980B9" if u["tipo"]=="Administrador" else "#27AE60",
+                                    ft.Text(u["tipo_usuario"], color="white", size=12),
+                                    bgcolor="#2980B9" if u["tipo_usuario"] == "administrador" else "#27AE60",
                                     padding=ft.padding.symmetric(horizontal=10, vertical=2),
                                     border_radius=6,
                                     margin=ft.margin.only(left=10)
@@ -145,10 +166,10 @@ def AdminPage(page: ft.Page):
             label="Tipo de Usuário",
             width=200,
             options=[
-                ft.dropdown.Option("Administrador"),
-                ft.dropdown.Option("Usuário"),
+                ft.dropdown.Option("administrador"),
+                ft.dropdown.Option("comum"),
             ],
-            value="Usuário",
+            value="comum",
             label_style=ft.TextStyle(color="#2C3E50")
         )
         senha = ft.TextField(label="Senha", password=True, can_reveal_password=True, width=200, label_style=ft.TextStyle(color="#2C3E50"))
@@ -162,13 +183,7 @@ def AdminPage(page: ft.Page):
                 page.snack_bar.open = True
                 page.update()
                 return
-            usuarios.append({
-                "nome": nome.value,
-                "usuario": usuario_nome.value,
-                "email": email.value,
-                "tipo": tipo.value,
-                "senha": senha.value
-            })
+            inserir_usuario(nome.value, usuario_nome.value, email.value, tipo.value, senha.value)
             nome.value = ""
             usuario_nome.value = ""
             email.value = ""

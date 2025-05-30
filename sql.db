@@ -1,0 +1,59 @@
+CREATE DATABASE helpdesk;
+
+-- Tabela de Usuários
+CREATE TABLE usuarios (
+    id_usuario INT AUTO_INCREMENT PRIMARY KEY,
+    nome_completo VARCHAR(100) NOT NULL,
+    nome_usuario VARCHAR(50) NOT NULL UNIQUE,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    tipo_usuario VARCHAR(20) NOT NULL CHECK (tipo_usuario IN ('comum', 'administrador')),
+    senha VARCHAR(255) NOT NULL
+);
+
+-- Tabela de Tickets/Chamados
+CREATE TABLE tickets (
+    id_ticket INT AUTO_INCREMENT PRIMARY KEY,
+    titulo VARCHAR(200) NOT NULL,
+    descricao TEXT NOT NULL,
+    data_criacao DATE NOT NULL,
+    hora_criacao TIME NOT NULL,
+    status VARCHAR(20) NOT NULL,
+    prioridade VARCHAR(20) NOT NULL,
+    urgencia VARCHAR(20) NOT NULL,
+    categoria VARCHAR(50) NOT NULL,
+    sla VARCHAR(20) NOT NULL,
+    id_usuario_criador INTEGER NOT NULL,
+    FOREIGN KEY (id_usuario_criador) REFERENCES usuarios(id_usuario)
+);
+
+-- Tabela de Anexos dos Tickets
+CREATE TABLE anexos (
+    id_anexo INT AUTO_INCREMENT PRIMARY KEY,
+    id_ticket INTEGER NOT NULL,
+    nome_arquivo VARCHAR(255) NOT NULL,
+    caminho_arquivo VARCHAR(255) NOT NULL,
+    data_upload DATETIME NOT NULL,
+    FOREIGN KEY (id_ticket) REFERENCES tickets(id_ticket)
+);
+
+-- Tabela de Respostas dos Tickets
+CREATE TABLE respostas (
+    id_resposta INT AUTO_INCREMENT PRIMARY KEY,
+    id_ticket INTEGER NOT NULL,
+    id_usuario INTEGER NOT NULL,
+    mensagem TEXT NOT NULL,
+    data_resposta DATE NOT NULL,
+    hora_resposta TIME NOT NULL,
+    FOREIGN KEY (id_ticket) REFERENCES tickets(id_ticket),
+    FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario)
+);
+
+-- Relacionamento de usuários com tickets (caso queira registrar participantes, não só o criador)
+CREATE TABLE usuarios_tickets (
+    id_usuario INTEGER NOT NULL,
+    id_ticket INTEGER NOT NULL,
+    tipo_participacao VARCHAR(20) NOT NULL, -- exemplo: 'criador', 'responsavel', 'observador'
+    PRIMARY KEY (id_usuario, id_ticket),
+    FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario),
+    FOREIGN KEY (id_ticket) REFERENCES tickets(id_ticket)
+);

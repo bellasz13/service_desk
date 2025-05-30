@@ -5,8 +5,26 @@ def BibliotecaPage(page: ft.Page, usuario_logado=None):
     page.bgcolor = "#F4F6F7"
 
     faqs = [
-        {"pergunta": "Como redefinir minha senha?", "resposta": "Acesse a tela de login, clique em 'Esqueci minha senha' e siga as instruções."},
-        {"pergunta": "Como abrir um chamado?", "resposta": "Clique em 'Novo Ticket' no menu lateral e preencha o formulário."},
+         {
+            "pergunta": "Como abro um novo chamado?",
+            "resposta": "Clique em 'Abrir chamado', preencha os campos necessários e clique em 'Enviar'."
+        },
+        {
+            "pergunta": "Como acompanho o status do meu chamado?",
+            "resposta": "Acesse a área de 'Tickets' no menu lateral para visualizar todos os seus chamados e seus respectivos status."
+        },
+        {
+            "pergunta": "Posso anexar arquivos ao meu chamado?",
+            "resposta": "Sim, ao abrir um novo ticket, utilize o botão 'Anexar Arquivo' para enviar documentos ou imagens relacionados ao seu chamado."
+        },
+        {
+            "pergunta": "Como altero meus dados de perfil?",
+            "resposta": "Abra um chamado solicitando a mudança, apenas técnicos e administradores podem alterar os dados de um usuário"
+        },
+        {
+            "pergunta": "O que faço se esqueci minha senha?",
+            "resposta": "Abra um chamado solicitando a mudança da senha, apnas técnicos e adminnistradores podem alterar a senha."
+        },
     ]
     tutoriais = [
         {"titulo": "Configurar e-mail corporativo", "passos": [
@@ -215,7 +233,7 @@ def BibliotecaPage(page: ft.Page, usuario_logado=None):
     atualizar_lista()
 
     def voltar(e):
-        if usuario_logado and usuario_logado.get("tipo") == "admin":
+        if usuario_logado and usuario_logado.get("tipo") == "administrador":
             page.go("/inicial")
         else:
             page.go("/user")

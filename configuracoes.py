@@ -24,16 +24,6 @@ def ConfiguracoesPage(page: ft.Page):
     artigo_aprovacao = ft.Checkbox(label="Artigos precisam de aprovação", value=True, label_style=ft.TextStyle(color="#2C3E50"))
     artigo_notificacao = ft.Switch(label="Notificar agentes sobre novos artigos", value=True, label_style=ft.TextStyle(color="#2C3E50"))
 
-    # tickets
-    categorias = ft.TextField(label="Categorias (separe por vírgula)", value="Suporte Técnico, Financeiro, Infraestrutura, Outro", width=400, label_style=ft.TextStyle(color="#2C3E50"))
-    prioridades = ft.TextField(label="Prioridades (separe por vírgula)", value="Baixa, Média, Alta, Crítica", width=400, label_style=ft.TextStyle(color="#2C3E50"))
-    status = ft.TextField(label="Status disponíveis (separe por vírgula)", value="Aberto, Em Espera, Fechado, Atribuído", width=400, label_style=ft.TextStyle(color="#2C3E50"))
-
-    # notificações
-    notifica_email = ft.Switch(label="Notificar por e-mail", value=True, label_style=ft.TextStyle(color="#2C3E50"))
-    notifica_push = ft.Switch(label="Notificar por push", value=False, label_style=ft.TextStyle(color="#2C3E50"))
-    notifica_cliente = ft.Checkbox(label="Enviar notificações também para clientes", value=True, label_style=ft.TextStyle(color="#2C3E50"))
-    modelo_email = ft.TextField(label="Assunto padrão do e-mail", value="Atualização do seu chamado", width=350, label_style=ft.TextStyle(color="#2C3E50"))
 
     def salvar_configuracoes(e):
         page.snack_bar = ft.SnackBar(
@@ -88,26 +78,6 @@ def ConfiguracoesPage(page: ft.Page):
                     artigo_notificacao,
                 ], spacing=10)
             ),
-            ft.Tab(
-                text="Tickets",
-                content=ft.Column([
-                    ft.Text("Configure categorias, prioridades e status de tickets.", color="#2C3E50"),
-                    categorias,
-                    prioridades,
-                    status,
-                ], spacing=10)
-            ),
-            ft.Tab(
-                text="Notificações",
-                content=ft.Column([
-                    ft.Text("Notificações automáticas para clientes e equipe.", color="#2C3E50"),
-                    notifica_email,
-                    notifica_push,
-                    notifica_cliente,
-                    modelo_email,
-                ], spacing=10)
-            ),
-    
         ],
         expand=True
     )

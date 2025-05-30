@@ -1,4 +1,5 @@
 import flet as ft
+from database import contar_tickets_atribuidos, contar_tickets_novos, contar_tickets_espera
 
 def InicialPage(page: ft.Page):
     page.title = "Help Desk - Dashboard"
@@ -26,9 +27,6 @@ def InicialPage(page: ft.Page):
     def tickets(e):
         page.go("/tickets")
 
-    def estatistica(e):
-        page.go("/estatistica")
-
     def admin(e):
         page.go("/admin")
 
@@ -37,17 +35,14 @@ def InicialPage(page: ft.Page):
 
     def novo_ticket(e):
         page.go("/novo_ticket")
-
-    def faq(e):
-        page.go("/faq")
-        
-    def notificacoes(e):
-        page.go("/notificacoes")
     
     def biblioteca(e):
         page.go("/biblioteca")
 
     def render_page():
+        tickets_atribuidos = contar_tickets_atribuidos()
+        tickets_novos = contar_tickets_novos()
+        tickets_espera = contar_tickets_espera()
     
         header = ft.Container(
             ft.Row(
@@ -60,7 +55,6 @@ def InicialPage(page: ft.Page):
                     ),
                     ft.Text("Help Desk", size=24, weight=ft.FontWeight.BOLD, color="#2C3E50"),
                     ft.Container(expand=True),
-                    ft.IconButton(ft.Icons.NOTIFICATIONS, icon_color="#2C3E50", tooltip="Notificações", on_click=notificacoes),
                     ft.IconButton(ft.Icons.SEARCH, icon_color="#2C3E50", tooltip="Pesquisar", on_click=pesquisa),
                     ft.IconButton(ft.Icons.EXIT_TO_APP, icon_color="#2C3E50", tooltip="Sair", on_click=sair),
                 ],
@@ -84,11 +78,6 @@ def InicialPage(page: ft.Page):
                         ft.Container(
                             ft.Row([ft.Icon(ft.Icons.SUPPORT, color="white"), ft.Text("Tickets", color="white", size=16)]),
                             on_click=tickets,
-                            padding=5
-                        ),
-                        ft.Container(
-                            ft.Row([ft.Icon(ft.Icons.PIE_CHART, color="white"), ft.Text("Estatísticas", color="white", size=16)]),
-                            on_click=estatistica,
                             padding=5
                         ),
                         ft.Container(
@@ -116,8 +105,7 @@ def InicialPage(page: ft.Page):
                 ft.Column(
                     [
                         ft.IconButton(icon=ft.Icons.DASHBOARD, tooltip="Dashboard", on_click=dashboard, icon_color="white"),
-                        ft.IconButton(icon=ft.Icons.SUPPORT, tooltip="Tickets", on_click=tickets, icon_color="white"),
-                        ft.IconButton(icon=ft.Icons.PIE_CHART, tooltip="Estatísticas", on_click=estatistica, icon_color="white"),
+                        ft.IconButton(icon=ft.Icons.SUPPORT_AGENT, tooltip="Tickets", on_click=tickets, icon_color="white"),
                         ft.IconButton(icon=ft.Icons.ADMIN_PANEL_SETTINGS, tooltip="Admin", on_click=admin, icon_color="white"),
                         ft.Divider(color="#34495E"),
                         ft.IconButton(icon=ft.Icons.SETTINGS, tooltip="Configurações", on_click=configuracoes, icon_color="white"),
@@ -136,21 +124,21 @@ def InicialPage(page: ft.Page):
                 ft.Container(
                     ft.Column([
                         ft.Text("Tickets Atribuídos", size=16, weight=ft.FontWeight.BOLD, color="#2C3E50"),
-                        ft.Text("5", size=32, weight=ft.FontWeight.BOLD, color="#2980B9"),
+                        ft.Text(str(tickets_atribuidos), size=32, weight=ft.FontWeight.BOLD, color="#2980B9"),
                     ], alignment=ft.MainAxisAlignment.CENTER),
                     width=200, height=120, bgcolor="#D6EAF8", border_radius=10, padding=20
                 ),
                 ft.Container(
                     ft.Column([
                         ft.Text("Tickets Novos", size=16, weight=ft.FontWeight.BOLD, color="#2C3E50"),
-                        ft.Text("2", size=32, weight=ft.FontWeight.BOLD, color="#27AE60"),
+                        ft.Text(str(tickets_novos), size=32, weight=ft.FontWeight.BOLD, color="#27AE60"),
                     ], alignment=ft.MainAxisAlignment.CENTER),
                     width=200, height=120, bgcolor="#D5F5E3", border_radius=10, padding=20
                 ),
                 ft.Container(
                     ft.Column([
                         ft.Text("Tickets em Espera", size=16, weight=ft.FontWeight.BOLD, color="#2C3E50"),
-                        ft.Text("1", size=32, weight=ft.FontWeight.BOLD, color="#F39C12"),
+                        ft.Text(str(tickets_espera), size=32, weight=ft.FontWeight.BOLD, color="#F39C12"),
                     ], alignment=ft.MainAxisAlignment.CENTER),
                     width=200, height=120, bgcolor="#FCF3CF", border_radius=10, padding=20
                 ),
@@ -162,7 +150,6 @@ def InicialPage(page: ft.Page):
         quick_actions = ft.Row(
             [
                 ft.ElevatedButton(text="Novo Ticket", icon=ft.Icons.ADD, bgcolor="#2980B9", color="white", on_click=novo_ticket),
-                ft.ElevatedButton(text="FAQ", icon=ft.Icons.HELP, bgcolor="#F39C12", color="white", on_click=faq),
                 ft.ElevatedButton(text="Biblioteca", icon=ft.Icons.LIBRARY_ADD, bgcolor="#2980B9", on_click=biblioteca),
             ],
             alignment=ft.MainAxisAlignment.CENTER,

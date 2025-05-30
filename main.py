@@ -1,18 +1,18 @@
 import flet as ft
 from inicial import InicialPage
 from novo_ticket import NovoTicketPage
-from faq import FAQPage
 from dashboard import DashboardPage
 from tickets import TicketsPage
-from estatistica import EstatisticaPage
 from admin import AdminPage
-from notificacoes import NotificacoesPage
 from pesquisa import PesquisaPage
 from configuracoes import ConfiguracoesPage
 from biblioteca import BibliotecaPage
 from user import UserPage
 from ticket_user import TicketUserPage
 from perfil_user import PerfilUserPage
+from exportacao import ExportacaoPage
+
+from database import verificar_usuario
 
 def LoginPage(page, on_login_success):
     page.title = "Help Desk - Login"
@@ -25,10 +25,15 @@ def LoginPage(page, on_login_success):
         senha = campo_senha.value
 
         if usuario and senha:
-            if usuario == "admin" and senha == "1234":
-                on_login_success({"usuario": usuario, "tipo": "admin"})
-            elif usuario == "user" and senha == "1234":
-                on_login_success({"usuario": usuario, "tipo": "comum"})
+            usuario_db = verificar_usuario(usuario, senha)
+            if usuario_db:
+                on_login_success({
+                    "id_usuario": usuario_db["id_usuario"],
+                    "usuario": usuario_db["nome_usuario"],
+                    "tipo": usuario_db["tipo_usuario"],
+                    "nome_completo": usuario_db["nome_completo"],
+                    "email": usuario_db["email"]
+                })
             else:
                 snack_bar = ft.SnackBar(
                     content=ft.Text("Usuário ou senha incorretos!"),
@@ -74,8 +79,6 @@ def LoginPage(page, on_login_success):
         bgcolor="#34495E",
     )
 
-    lembrar_usuario = ft.Checkbox(label="Lembrar usuário", fill_color="white", label_style=ft.TextStyle(color="white"))
-
     botao_entrar = ft.ElevatedButton(
         text="Entrar",
         on_click=entrar_click,
@@ -90,7 +93,6 @@ def LoginPage(page, on_login_success):
                 logo,
                 campo_usuario,
                 campo_senha,
-                lembrar_usuario,
                 botao_entrar,
             ],
             alignment=ft.MainAxisAlignment.CENTER,
@@ -111,7 +113,7 @@ def main(page: ft.Page):
     def on_login_success(usuario):
         nonlocal usuario_logado
         usuario_logado = usuario
-        if usuario["tipo"] == "admin":
+        if usuario["tipo"] == "administrador":
             page.go("/inicial")
         elif usuario["tipo"] == "comum":
             page.go("/user")
@@ -122,7 +124,7 @@ def main(page: ft.Page):
         if page.route == "/":
             LoginPage(page, on_login_success)
         elif page.route == "/inicial":
-            if usuario_logado and usuario_logado.get("tipo") == "admin":
+            if usuario_logado and usuario_logado.get("tipo") == "administrador":
                 InicialPage(page)
             else:
                 page.go("/")
@@ -140,28 +142,24 @@ def main(page: ft.Page):
             NovoTicketPage(page, usuario_logado)
         elif page.route == "/perfil":
             PerfilUserPage(page, usuario_logado)
-        elif page.route == "/faq":
-            FAQPage(page)
         elif page.route == "/dashboard":
             DashboardPage(page)
         elif page.route == "/tickets":
             TicketsPage(page, usuario_logado)
-        elif page.route == "/estatistica":
-            EstatisticaPage(page)
         elif page.route == "/admin":
             AdminPage(page)
-        elif page.route == "/notificacoes":
-            NotificacoesPage(page)
         elif page.route == "/pesquisa":
             PesquisaPage(page)
         elif page.route == "/configuracoes":
             ConfiguracoesPage(page)
         elif page.route == "/biblioteca":
             BibliotecaPage(page, usuario_logado)
+        elif page.route == "/exportacao":
+            ExportacaoPage(page)
         else:
             LoginPage(page, on_login_success)
 
     page.on_route_change = route_change
     page.go("/")
 
-ft.app(target=main)
+ft.app(target=main, upload_dir="uploads")
