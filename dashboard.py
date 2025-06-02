@@ -72,7 +72,6 @@ def DashboardPage(page: ft.Page):
         [
             ft.ElevatedButton(text="Novo Ticket", icon=ft.Icons.ADD, bgcolor="#2980B9", color="white", on_click=novo_ticket),
             ft.ElevatedButton(text="Buscar Ticket", icon=ft.Icons.SEARCH, bgcolor="#27AE60", color="white", on_click=buscar_ticket),
-            ft.ElevatedButton(text="FAQ", icon=ft.Icons.HELP, bgcolor="#F39C12", color="white", on_click=faq),
         ],
         alignment=ft.MainAxisAlignment.CENTER,
         spacing=20,

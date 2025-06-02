@@ -457,3 +457,21 @@ def buscar_tickets_filtrados(
             cursor.close()
             conn.close()
     return tickets
+
+def buscar_nome_usuario_por_id(id_usuario):
+    conn = conectar()
+    nome = None
+    if conn:
+        cursor = conn.cursor()
+        try:
+            cursor.execute("SELECT nome_completo FROM usuarios WHERE id_usuario = %s", (id_usuario,))
+            resultado = cursor.fetchone()
+            if resultado:
+                nome = resultado[0]
+        except Exception as e:
+            print(f"Erro ao buscar nome do usuário: {e}")
+        finally:
+            cursor.close()
+            conn.close()
+    return nome
+

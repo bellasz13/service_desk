@@ -2,7 +2,8 @@ import flet as ft
 import os
 import platform
 import subprocess
-from database import buscar_tickets_por_usuario, buscar_respostas_ticket, inserir_resposta, atualizar_ticket_status, atualizar_ticket_campos, buscar_anexos_ticket
+from datetime import datetime
+from database import buscar_tickets_por_usuario, buscar_respostas_ticket, inserir_resposta, buscar_anexos_ticket,inserir_anexo, buscar_nome_usuario_por_id
 
 def TicketUserPage(page: ft.Page, usuario_logado):
     page.title = "Meus Tickets - Help Desk"
@@ -27,14 +28,6 @@ def TicketUserPage(page: ft.Page, usuario_logado):
         width=320,
         label_style=ft.TextStyle(color="#2C3E50")
     )
-    
-    anexo = ft.FilePicker()
-    anexo_button = ft.ElevatedButton(
-        "Anexar Arquivo",
-        icon=ft.Icons.ATTACH_FILE,
-        on_click=lambda e: anexo.pick_files(allow_multiple=False)
-    )
-    page.overlay.append(anexo)
 
     def voltar(e):
         page.go("/user")
@@ -46,6 +39,53 @@ def TicketUserPage(page: ft.Page, usuario_logado):
         render_detalhe_ticket(ticket)
 
     def render_detalhe_ticket(ticket):
+        anexo_resposta_info = ft.Text("", size=14, color="#2C3E50", visible=False)
+        anexo_resposta_remover_btn = ft.IconButton(
+            icon=ft.Icons.CLOSE, icon_color="#7F8C8D", visible=False
+        )
+        anexo_resposta_arquivo = {"file": None, "file_path": None}
+
+        def on_file_picker_result_resposta(e: ft.FilePickerResultEvent):
+            if e.files:
+                f = e.files[0]
+                uploads_dir = "uploads"
+                if not os.path.exists(uploads_dir):
+                    os.makedirs(uploads_dir)
+                caminho_arquivo = os.path.join(uploads_dir, f.name)
+                with open(f.path, "rb") as source:
+                    with open(caminho_arquivo, "wb") as dest:
+                        dest.write(source.read())
+                anexo_resposta_arquivo["file"] = f
+                anexo_resposta_arquivo["file_path"] = caminho_arquivo
+                anexo_resposta_info.value = f"{f.name} ({round(f.size/1024)}K)"
+                anexo_resposta_info.visible = True
+                anexo_resposta_remover_btn.visible = True
+                anexo_resposta_info.update()
+                anexo_resposta_remover_btn.update()
+            else:
+                remover_anexo_resposta(None)
+
+        def remover_anexo_resposta(e):
+            anexo_resposta_arquivo["file"] = None
+            anexo_resposta_arquivo["file_path"] = None
+            anexo_resposta_info.value = ""
+            anexo_resposta_info.visible = False
+            anexo_resposta_remover_btn.visible = False
+            anexo_resposta_info.update()
+            anexo_resposta_remover_btn.update()
+
+        anexo_resposta_remover_btn.on_click = remover_anexo_resposta
+
+        anexo_resposta = ft.FilePicker(on_result=on_file_picker_result_resposta)
+        if anexo_resposta not in page.overlay:
+            page.overlay.append(anexo_resposta)
+
+        anexo_resposta_button = ft.ElevatedButton(
+            "Anexar Arquivo à Resposta",
+            icon=ft.Icons.ATTACH_FILE,
+            on_click=lambda e: anexo_resposta.pick_files(allow_multiple=False)
+        )
+
         def voltar_lista(e):
             render_lista_tickets()
 
@@ -62,8 +102,7 @@ def TicketUserPage(page: ft.Page, usuario_logado):
 
         def adicionar_resposta(e):
             texto = resposta_field.value.strip()
-            if texto:
-                from datetime import datetime
+            if texto or anexo_resposta_arquivo["file"]:
                 data_resposta = datetime.now().strftime("%Y-%m-%d")
                 hora_resposta = datetime.now().strftime("%H:%M:%S")
                 inserir_resposta(
@@ -73,13 +112,25 @@ def TicketUserPage(page: ft.Page, usuario_logado):
                     data_resposta,
                     hora_resposta
                 )
+                if anexo_resposta_arquivo["file"]:
+                    file_obj = anexo_resposta_arquivo["file"]
+                    nome_arquivo = file_obj.name
+                    caminho_arquivo = anexo_resposta_arquivo["file_path"]
+                    data_upload = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                    inserir_anexo(
+                        ticket["id_ticket"],
+                        nome_arquivo,
+                        caminho_arquivo,
+                        data_upload
+                    )
                 resposta_field.value = ""
+                remover_anexo_resposta(None)
                 page.snack_bar = ft.SnackBar(
                     ft.Text("Resposta adicionada!", color="#2C3E50"),
                     bgcolor="#2980B9"
                 )
                 page.snack_bar.open = True
-                render_detalhe_ticket(ticket)
+                render_detalhe_ticket(ticket)   
         
         def baixar_arquivo(path):
    
@@ -135,6 +186,9 @@ def TicketUserPage(page: ft.Page, usuario_logado):
         ], spacing=8)
 
         page.controls.clear()
+        
+        nome_criador = buscar_nome_usuario_por_id(ticket["id_usuario_criador"])
+        
         page.add(
             ft.Container(
                 ft.ListView([
@@ -143,6 +197,7 @@ def TicketUserPage(page: ft.Page, usuario_logado):
                         ft.Text(f"Ticket #{ticket['id_ticket']}", size=22, weight=ft.FontWeight.BOLD, color="#2C3E50"),
                     ], alignment=ft.MainAxisAlignment.START),
                     ft.Divider(),
+                    ft.Text(f"Criado por: {nome_criador}", color="#2C3E50", size=14),
                     ft.Text(ticket["titulo"], size=20, weight=ft.FontWeight.BOLD, color="#2C3E50"),
                     ft.Text(ticket["descricao"], color="#2C3E50"),
                     ft.Row([
@@ -188,9 +243,10 @@ def TicketUserPage(page: ft.Page, usuario_logado):
                     ft.Text("Respostas:", size=16, weight=ft.FontWeight.BOLD, color="#2C3E50"),
                     respostas_list if respostas else ft.Text("Nenhuma resposta ainda.", color="#2C3E50"),
                     ft.Divider(),
+                    ft.Row([anexo_resposta_info, anexo_resposta_remover_btn], spacing=5),
                     resposta_field if ticket["status"] != "Fechado" else ft.Text("Ticket fechado. Não é possível responder.", color="#AAB7B8"),
                     ft.Row([
-                        anexo_button,
+                        anexo_resposta_button,
                         ft.ElevatedButton(
                             "Adicionar Resposta",
                             icon=ft.Icons.SEND,
@@ -226,6 +282,7 @@ def TicketUserPage(page: ft.Page, usuario_logado):
         ]
         for t in filtrados:
             cor_status = {"Aberto": "#27AE60", "Fechado": "#AAB7B8", "Em Espera": "#F39C12"}.get(t["status"], "#7F8C8D")
+            nome_criador = buscar_nome_usuario_por_id(t["id_usuario_criador"])
             lista_tickets.controls.append(
                 ft.GestureDetector(
                     on_tap=lambda e, ticket=t: abrir_ticket(ticket),
@@ -234,6 +291,7 @@ def TicketUserPage(page: ft.Page, usuario_logado):
                             ft.Column([
                                 ft.Row([
                                     ft.Text(f"#{t['id_ticket']}", size=14, color="#7F8C8D"),
+                                    ft.Text(f"Criado por: {nome_criador}", color="#2C3E50", size=14),
                                     ft.Text(t["titulo"], size=18, weight=ft.FontWeight.BOLD, color="#2C3E50"),
                                     ft.Container(
                                         ft.Text(t["status"], color="white", size=12),
